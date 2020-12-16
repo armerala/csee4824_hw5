@@ -1,7 +1,7 @@
 CC      := gcc
 CFLAGS  := -g -Wall
 LDFLAGS :=
-OBJS    := main.o
+OBJS    := main.o lcs.o
 
 # main longest common subsequence program (lcs)
 lcs: $(OBJS)
