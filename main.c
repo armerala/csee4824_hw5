@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <time.h>
 #include "lcs.h"
+#define NUM_ITERATIONS   5                   // how many times to run the experiments
 
 /**
  * Prints the cache out in a for debug
@@ -73,15 +74,27 @@ int main(int argc, char** argv)
 	lh_buf[lh_size] = '\0';
 	lh_buf[rh_size] = '\0';
 
-	printf("Left-hand sequence:  %s \n", lh_buf);
-	printf("Right-hand sequence: %s \n", rh_buf);
+	//printf("Left-hand sequence:  %s \n", lh_buf);
+	//printf("Right-hand sequence: %s \n", rh_buf);
 
 	fclose(lh_fp);
 	fclose(rh_fp);
 
-	//run the algorithm
-	lcs_no_branching(lh_buf, rh_buf, cache, lh_size-1, rh_size-1);
-	print_cache(cache, lh_size-1, rh_size-1);
+	size_t n;
+	size_t lcs_time_total = 0;
+	struct timespec start, end;	
+
+	//run and time the algorithm
+	for(n = 0; n < NUM_ITERATIONS; n++)
+	{
+		clock_gettime(CLOCK_MONOTONIC, &start);
+		lcs_no_branching(lh_buf, rh_buf, cache, lh_size-1, rh_size-1);
+		clock_gettime(CLOCK_MONOTONIC, &end);	
+		lcs_time_total += (end.tv_nsec - start.tv_nsec);
+	}
+	long double loop_lcs_avg = (long double)lcs_time_total / (long double)NUM_ITERATIONS;
+	printf("average lcs addition time (ns): %.01Lf\n ", loop_lcs_avg);
+	//print_cache(cache, lh_size-1, rh_size-1);
 
 	// clean up
 	free(lh_buf);
